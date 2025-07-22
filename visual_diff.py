@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 import time
 import re
+from prompt_toolkit import prompt
 
 class BulkVisualComparator:
     def __init__(self, prod_domain, hml_domain, max_pages=20):
@@ -447,19 +448,19 @@ def get_user_input():
         print("Exemplo: teste.com.br ou https://teste.com.br ou teste.com.br:8080")
         print()
         
-        prod_domain = input("🟢 Domínio de PRODUÇÃO: ").strip()
+        prod_domain = prompt("🟢 Domínio de PRODUÇÃO: ").strip()
         if not prod_domain:
             print("❌ Domínio de produção não pode estar vazio!")
             continue
             
-        hml_domain = input("🟡 Domínio de HOMOLOGAÇÃO: ").strip()
+        hml_domain = prompt("🟡 Domínio de HOMOLOGAÇÃO: ").strip()
         if not hml_domain:
             print("❌ Domínio de homologação não pode estar vazio!")
             continue
         
-        # Remove protocolos se existirem
-        prod_clean = prod_domain.replace('https://', '').replace('http://', '')
-        hml_clean = hml_domain.replace('https://', '').replace('http://', '')
+        # Remove protocolos e barra final, se existirem
+        prod_clean = prod_domain.replace('https://', '').replace('http://', '').rstrip('/')
+        hml_clean = hml_domain.replace('https://', '').replace('http://', '').rstrip('/')
         
         print(f"\n📋 CONFIGURAÇÃO:")
         print(f"   Produção:    {prod_clean}")
@@ -467,7 +468,7 @@ def get_user_input():
         print("   (Protocolo será detectado automaticamente)")
         
         while True:
-            confirm = input("\n✅ Confirma essa configuração? (s/n): ").lower().strip()
+            confirm = prompt("\n✅ Confirma essa configuração? (s/n): ").lower().strip()
             if confirm in ['s', 'sim', 'y', 'yes']:
                 return prod_clean, hml_clean
             elif confirm in ['n', 'não', 'nao', 'no']:
@@ -479,7 +480,7 @@ def get_max_pages():
     """Solicita número máximo de páginas"""
     while True:
         try:
-            max_pages = input("\n📄 Quantas páginas deseja comparar? (padrão: 20): ").strip()
+            max_pages = prompt("\n📄 Quantas páginas deseja comparar? (padrão: 20): ").strip()
             if not max_pages:
                 return 20
             
@@ -489,7 +490,7 @@ def get_max_pages():
                 continue
             elif max_pages > 100:
                 print("⚠️  Muitas páginas podem demorar bastante. Recomendamos máximo 50.")
-                confirm = input("Deseja continuar mesmo assim? (s/n): ").lower().strip()
+                confirm = prompt("Deseja continuar mesmo assim? (s/n): ").lower().strip()
                 if confirm not in ['s', 'sim', 'y', 'yes']:
                     continue
             
